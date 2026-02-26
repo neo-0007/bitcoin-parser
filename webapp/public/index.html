@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Bitcoin Transaction Visualizer</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <header>
+      <div class="logo">BTC Visualizer</div>
+      <div class="health-info">
+        <span class="health-dot" id="healthDot"></span>
+        <span id="healthLabel">checking...</span>
+      </div>
+    </header>
+
+    <main>
+      <!-- ── Input section ── -->
+      <div class="input-section">
+        <div class="section-title">Analyze Transaction</div>
+        <div class="tabs">
+          <button class="tab active" onclick="switchTab('fixture')">
+            Fixture JSON
+          </button>
+          <button class="tab" onclick="switchTab('raw')">
+            Raw TX + Prevouts
+          </button>
+          <button class="tab" onclick="switchTab('block')">Block Files</button>
+        </div>
+
+        <!-- Fixture JSON tab -->
+        <div class="tab-panel active" id="tab-fixture">
+          <label class="form-label">Paste fixture JSON</label>
+          <textarea
+            id="fixtureInput"
+            placeholder='{"network":"mainnet","raw_tx":"0200...","prevouts":[...]}'
+          ></textarea>
+          <button
+            class="btn-analyze"
+            id="analyzeBtn"
+            onclick="analyzeFixture()"
+          >
+            <span class="spinner"></span>
+            <span class="btn-text">Analyze Transaction →</span>
+          </button>
+        </div>
+
+        <!-- Raw TX tab -->
+        <div class="tab-panel" id="tab-raw">
+          <label class="form-label">Raw TX Hex</label>
+          <input type="text" id="rawTxInput" placeholder="0200000001..." />
+          <label class="form-label" style="margin-top: 12px"
+            >Prevouts JSON array</label
+          >
+          <textarea
+            id="prevoutsInput"
+            style="min-height: 80px"
+            placeholder='[{"txid":"...","vout":0,"value_sats":123456,"script_pubkey_hex":"..."}]'
+          ></textarea>
+          <button class="btn-analyze" onclick="analyzeRaw()">
+            <span class="spinner"></span>
+            <span class="btn-text">Analyze Transaction →</span>
+          </button>
+        </div>
+
+        <!-- Block files tab -->
+        <div class="tab-panel" id="tab-block">
+          <div class="two-col">
+            <div>
+              <label class="form-label">blk*.dat</label>
+              <div
+                class="file-drop"
+                onclick="triggerFile('blkFile')"
+                id="blkDrop"
+              >
+                <div>Drop or click to select</div>
+                <input
+                  type="file"
+                  id="blkFile"
+                  onchange="showFileName(this, 'blkDrop')"
+                />
+                <div class="file-name" id="blkName"></div>
+              </div>
+            </div>
+            <div>
+              <label class="form-label">rev*.dat</label>
+              <div
+                class="file-drop"
+                onclick="triggerFile('revFile')"
+                id="revDrop"
+              >
+                <div>Drop or click to select</div>
+                <input
+                  type="file"
+                  id="revFile"
+                  onchange="showFileName(this, 'revDrop')"
+                />
+                <div class="file-name" id="revName"></div>
+              </div>
+            </div>
+          </div>
+          <div style="margin-top: 12px">
+            <label class="form-label">xor.dat</label>
+            <div
+              class="file-drop"
+              onclick="triggerFile('xorFile')"
+              id="xorDrop"
+              style="padding: 16px"
+            >
+              <div>Drop or click to select</div>
+              <input
+                type="file"
+                id="xorFile"
+                onchange="showFileName(this, 'xorDrop')"
+              />
+              <div class="file-name" id="xorName"></div>
+            </div>
+          </div>
+          <button class="btn-analyze" onclick="analyzeBlock()">
+            <span class="spinner"></span>
+            <span class="btn-text">Analyze Block →</span>
+          </button>
+          <div
+            style="
+              margin-top: 12px;
+              font-family: var(--mono);
+              font-size: 0.65rem;
+              color: var(--muted);
+            "
+          >
+            Block mode sends files to the backend CLI. Make sure the server is
+            running.
+          </div>
+        </div>
+
+        <div class="error-box" id="errorBox"></div>
+      </div>
+
+      <!-- ── Results ── -->
+      <div id="results" class="fade-in"></div>
+    </main>
+
+    <!-- Tx detail modal (for block mode) -->
+    <div class="modal-overlay" id="txModal">
+      <div class="modal-box">
+        <button class="modal-close" onclick="closeTxModal()">✕</button>
+        <div id="txModalContent"></div>
+      </div>
+    </div>
+    <script src="app.js"></script>
+  </body>
+</html>
